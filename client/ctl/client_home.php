@@ -63,7 +63,10 @@ if(get('upload')){
 			}
 		}
 		//publish it
-		$rv = $vc->pathPublish($upload_path,$preview_path,Config::get('vidcache','embed_tpl_handle'));
+		$embed_tpl_handle = Config::get('vidcache','embed_tpl_handle');
+		if(!is_null(Session::get('embed_tpl_override')))
+			$embed_tpl_handle = Session::get('embed_tpl_override');
+		$rv = $vc->pathPublish($upload_path,$preview_path,$embed_tpl_handle);
 		FS::fileStoreEmbedHandle($rv['embed_handle'],$upload_path);
 	}
 	//store the file internally

@@ -1,0 +1,42 @@
+#!/usr/bin/php
+<?php
+require_once(__DIR__.'/boot.php');
+
+use \LSS\Config;
+use \Vidcache\Client\FS;
+use \Vidcache\SDK;
+
+dolog('Removing embed object');
+
+if(!isset($argv[1]) || empty($argv[1]))
+	throw new Exception('No embed handle provided.');
+$embed_handle = $argv[1];
+
+//check if we have an old hash if so get the embed handle from the map
+if(strlen($embed_handle) == 32){
+	dolog('File hash passed, looking up embed object');
+	$file = FS::fetchFileMapByHash($embed_handle);
+	$embed_handle = !empty($file['embed_handle']) ? $file['embed_handle'] : $file['file_handle'];
+	dolog('Found embed handle: '.$embed_handle);
+}
+
+//setup sdk
+$vc = SDK::load();
+$vc->connect(Config::get('vidcache','api_key'));
+dolog('Connected to SDK');
+
+dolog('Looking up files by embed object');
+$files = FS::fetchFilesByHandleOrEmbedHandle($embed_handle);
+if(!count($files)){
+	dolog('No files found for deletion');
+	exit;
+}
+
+dolog('Removing the following files');
+foreach($files as $file){
+	dolog('Removing File: '.$file['path']);
+	//FS::fileDeleteByPath($file['path']);
+}
+
+dolog('Embed object and files removed');
+

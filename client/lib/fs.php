@@ -118,6 +118,14 @@ abstract class FS {
 		);
 	}
 
+	public static function fetchFilesByHandleOrEmbedHandle($handle){
+		return Db::_get()->fetchAll(
+			'SELECT f.* FROM `files` AS f'
+			.' WHERE f.handle = ? OR f.embed_handle = ?'
+			,array($handle,$handle)
+		);
+	}
+
 	public static function fetchFileMapByHash($hash){
 		return Db::_get()->fetch(
 			'SELECT * FROM `file_map` WHERE `hash` = ?'
